@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@seyacat/reactive": "^1.0.12",
+    "minimist": "^1.2.8",
+    "uuid": "^9.0.1"
+  }
+}
