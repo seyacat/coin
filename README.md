@@ -1,1 +1,1 @@
-Test Coin
+Test Coin.
