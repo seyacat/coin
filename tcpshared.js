@@ -1,12 +1,8 @@
-var { v4: uuidv4 } = require("uuid");
+const Net = require("net");
 var { Reactivate, Reactive } = require("@seyacat/reactive");
-var dgram = require("node:dgram");
 
-function Shared(
-  options = { port: null, server: null, url: null, clienPaths: null }
-) {
+function Shared(options = { port: null, clienPaths: null }) {
   let reactive;
-
   //SERVER
   reactive = Reactivate(new SharedClass(options), {
     server: Reactive(null, { prefix: "server" }),
@@ -17,24 +13,31 @@ function Shared(
     (data) => {
       //TODO DELETE DISCONNECTED CLIENTS
       for (let [key, client] of reactive.clients) {
-        //DELETE DISNONNECTED
-        if (client._rel.readyState > 1) {
-          delete reactive.clients[key];
-          continue;
-        }
-        //SEND CHANGE
-
+        const [address, port] = key.split("/");
         const msg = JSON.stringify({
           ...data,
           path: ["server", ...data.path],
           base: null,
           pathValues: null,
           value: data.value,
-          address: options.address,
-          port: options.port,
+          address: "127.0.0.1",
+          port: reactive._rel.server.address().port,
         });
 
-        client._rel.write(msg + "\n\n");
+        const tcpClient = new Net.Socket();
+
+        tcpClient.connect(port, address, function () {
+          tcpClient.write(msg + "\n\n");
+        });
+        tcpClient.on("data", function (data) {
+          //console.log({ response: data.toString() });
+          //TODO HANDLE RESPONSE
+          tcpClient.destroy();
+        });
+        tcpClient.on("error", function (error) {
+          //TODO REMOVE CLIENT ON ERROR
+          console.log("handled error", error);
+        });
       }
     },
     { detailed: true }
@@ -47,11 +50,11 @@ function Shared(
         return;
       }
       if (data.path.length <= 1) return;
+      const key = data.path[0];
+      const [address, port] = key.split("/");
       const client = reactive.clients[data.path.slice(0, 1)];
       //DELETE DISNONNECTED
-      if (client._rel.readyState > 1) {
-        delete reactive.clients[data.path.slice(0, 1)];
-      }
+
       const msg = JSON.stringify({
         //...data,
         pathIds: [client._obId, ...data.pathIds.slice(1)],
@@ -59,11 +62,24 @@ function Shared(
         base: null,
         pathValues: null,
         value: data.value,
-        address: options.address,
-        port: options.port,
+        address: "127.0.0.1",
+        port: reactive._rel.server.address().port,
       });
 
-      client._rel.write(msg + "\n\n");
+      const tcpClient = new Net.Socket();
+
+      tcpClient.connect(port, address, function () {
+        tcpClient.write(msg + "\n\n");
+      });
+      tcpClient.on("data", function (data) {
+        //console.log({ response: data.toString() });
+        //TODO HANDLE RESPONSE
+        tcpClient.destroy();
+      });
+      tcpClient.on("error", function (error) {
+        //TODO REMOVE CLIENT ON ERROR
+        console.log("handled error", error);
+      });
     },
     { detailed: true }
   );
@@ -71,17 +87,24 @@ function Shared(
   return reactive;
 }
 class SharedClass {
-  constructor(
-    options = { port: null, server: null, url: null, clienPaths: null }
-  ) {
+  constructor(options = { port: null, clienPaths: null }) {
     this.mutted = new Set();
     this.options = { ...{ port: 12556, server: null }, ...options };
 
+    this.server = new Net.Server();
+    this.server.listen(
+      this.options.port,
+      function () {
+        console.log(
+          `Server listening for connection requests on socket localhost:${this.options.port}`
+        );
+      }.bind(this)
+    );
+
     //SERVER
-    this.options.server.on(
+    this.server.on(
       "connection",
       function (socket) {
-        console.log("Connected");
         socket.on(
           "data",
           this.onmessage.bind({ shared: this, socket: socket })
@@ -90,22 +113,13 @@ class SharedClass {
     );
   }
 
-  addTcpClient(tcpClient) {
-    tcpClient.connect(client.port, client.host, function () {
-      console.log("Connected");
-      //tcpclient.write("Hello From Client " + tcpclient.address().address);
-    });
-    this.reactive.clients[`${client.host}:${client.port}`] =
-      Reactivate(tcpClient);
-    tcpClient.on(
-      "data",
-      this.onmessage.bind({ shared: this, socket: tcpClient })
-    );
+  addTcpClient(options = { address, port }) {
+    this.reactive.clients[`${options.address}/${options.port}`] = Reactive({});
   }
 
   onmessage = async function (buff) {
     let sender = this.socket;
-    let uuid = `${this.socket.remoteAddress}:${this.socket.remotePort}`;
+
     let data;
 
     const payload = Buffer.from(buff).toString();
@@ -119,13 +133,12 @@ class SharedClass {
         continue;
       }
 
+      const { address, port } = data;
+      let uuid = `${address}/${port}`;
+
       //CREATE REACTIVES
       if (!this.shared.reactive.clients[uuid]) {
-        this.shared.reactive.clients[uuid] = Reactivate(
-          sender,
-          {},
-          { prefix: uuid }
-        );
+        this.shared.reactive.clients[uuid] = Reactive({}, { prefix: uuid });
         //this.shared.reactive.clients[uuid].triggerChange();
       }
 
@@ -144,6 +157,8 @@ class SharedClass {
             continue;
           }
         }
+        //TODO SEND VALID RESPONSE
+        sender.write(JSON.stringify({ ok: true }) + "\n\n");
         const path = ["clients", uuid, ...data.path];
         this.shared.mutted.add(path.join("."));
         let r = this.shared.reactive;
