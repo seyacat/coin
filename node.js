@@ -7,11 +7,10 @@ dotenv.config();
 const port = argv.port ?? process.env.PORT;
 const clients = JSON.parse(process.env.NODES);
 
-const { privateKey, publicKey } = cu.createKeyPair();
+const address = cu.createKeyPair();
 
 console.log({
-  privateKey,
-  publicKey,
+  address,
 });
 
 const shared = Shared({
@@ -28,7 +27,10 @@ shared.subscribe(null, (data) => {
 
 setInterval(() => {
   //if (argv.port == 12345) {
-  shared.server.introduce = true;
+  if (!shared.server.introduce) {
+    shared.server.introduce = true;
+  }
+
   shared.server.test = Math.floor(Math.random() * 100);
   //console.log("CLIETNS", Object.keys(shared.clients._));
 
@@ -41,7 +43,7 @@ setInterval(() => {
 (async () => {
   //sleep 100
   await new Promise((resolve, reject) => setTimeout(resolve, 1000));
-  for (address of clients) {
+  for (const address of clients) {
     shared._rel.addTcpClient(address);
   }
 })();
