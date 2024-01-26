@@ -5,7 +5,10 @@ setInterval(() => {
   console.log(Buffer.from(execSync("git fetch")).toString());
   const ret = Buffer.from(execSync("git status")).toString();
   console.log(ret);
-  if (ret.includes("Your branch is behind")) {
+  if (
+    ret.includes("Your branch is behind") ||
+    ret.includes("Tu rama está detrás de")
+  ) {
     console.log(Buffer.from(execSync("git pull")).toString());
   }
 }, 10000);
