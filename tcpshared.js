@@ -132,7 +132,7 @@ class SharedClass {
         continue;
       }
 
-      let uuid = `${address}/${port}`;
+      let uuid = `${address}`;
 
       //CREATE REACTIVES
       if (!this.shared.reactive.clients[uuid]) {
