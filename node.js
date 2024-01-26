@@ -1,15 +1,13 @@
 const { Shared } = require("./tcpshared.js");
-
+const dotenv = require("dotenv");
 const argv = require("minimist")(process.argv.slice(2));
+dotenv.config();
 
-console.log({ argv });
-clients =
-  argv.port == 12345
-    ? [{ address: "127.0.0.1", port: "12346" }]
-    : [{ address: "127.0.0.1", port: "12345" }];
+const port = argv.port ?? process.env.PORT;
+const clients = JSON.parse(process.env.NODES);
 
 const shared = Shared({
-  port: argv.port,
+  port,
   validations: {
     test: { validate: (data) => typeof data.value === "number" },
   },
@@ -33,7 +31,7 @@ setInterval(() => {
 (async () => {
   //sleep 100
   await new Promise((resolve, reject) => setTimeout(resolve, 1000));
-  for (client of clients) {
-    shared._rel.addTcpClient(client);
+  for (address of clients) {
+    shared._rel.addTcpClient(address);
   }
 })();

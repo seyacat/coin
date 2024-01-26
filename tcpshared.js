@@ -1,4 +1,5 @@
 const Net = require("net");
+
 var { Reactivate, Reactive } = require("@seyacat/reactive");
 
 function Shared(options = { port: null, clienPaths: null }) {
@@ -13,15 +14,14 @@ function Shared(options = { port: null, clienPaths: null }) {
     (data) => {
       //TODO DELETE DISCONNECTED CLIENTS
       for (let [key, client] of reactive.clients) {
-        const [address, port] = key.split("/");
+        const address = key;
+        const port = reactive._rel.options.port;
         const msg = JSON.stringify({
           ...data,
           path: [...data.path],
           base: null,
           pathValues: null,
           value: data.value,
-          address: "127.0.0.1",
-          port: reactive._rel.server.address().port,
         });
 
         const tcpClient = new Net.Socket();
@@ -36,7 +36,7 @@ function Shared(options = { port: null, clienPaths: null }) {
         });
         tcpClient.on("error", function (error) {
           //TODO REMOVE CLIENT ON ERROR
-          console.log("handled error", error);
+          console.log("handled error", error.message);
         });
       }
     },
@@ -51,7 +51,8 @@ function Shared(options = { port: null, clienPaths: null }) {
       }
       if (data.path.length <= 1) return;
       const key = data.path[0];
-      const [address, port] = key.split("/");
+      const address = key;
+      const port = reactive._rel.options.port;
       const client = reactive.clients[data.path.slice(0, 1)];
       //DELETE DISNONNECTED
       const msg = JSON.stringify({
@@ -61,8 +62,6 @@ function Shared(options = { port: null, clienPaths: null }) {
         base: null,
         pathValues: null,
         value: data.value,
-        address: "127.0.0.1",
-        port: reactive._rel.server.address().port,
       });
 
       const tcpClient = new Net.Socket();
@@ -77,7 +76,7 @@ function Shared(options = { port: null, clienPaths: null }) {
       });
       tcpClient.on("error", function (error) {
         //TODO REMOVE CLIENT ON ERROR
-        console.log("handled error", error);
+        console.log("handled error", error.message);
       });
     },
     { detailed: true }
@@ -88,7 +87,7 @@ function Shared(options = { port: null, clienPaths: null }) {
 class SharedClass {
   constructor(options = { port: null, clienPaths: null }) {
     this.mutted = new Set();
-    this.options = { ...{ port: 12556, server: null }, ...options };
+    this.options = { ...{ port: null, server: null }, ...options };
 
     this.server = new Net.Server();
     this.server.listen(
@@ -112,8 +111,8 @@ class SharedClass {
     );
   }
 
-  addTcpClient(options = { address, port }) {
-    this.reactive.clients[`${options.address}/${options.port}`] = Reactive({});
+  addTcpClient(address) {
+    this.reactive.clients[`${address}`] = Reactive({});
   }
 
   onmessage = async function (buff) {
