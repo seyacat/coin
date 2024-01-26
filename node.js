@@ -10,7 +10,9 @@ clients =
 
 const shared = Shared({
   port: argv.port,
-  //clientPaths: { message: { validate: (val) => typeof val === "string" } },
+  validations: {
+    test: { validate: (data) => typeof data.value === "number" },
+  },
 });
 
 shared.subscribe(null, (data) => {
@@ -19,7 +21,7 @@ shared.subscribe(null, (data) => {
 
 setInterval(() => {
   //if (argv.port == 12345) {
-  //shared.server.hola = Math.floor(Math.random() * 100);
+  shared.server.test = Math.floor(Math.random() * 100);
   //console.log("CLIETNS", Object.keys(shared.clients._));
 
   for (const [key, client] of shared.clients) {

@@ -16,7 +16,7 @@ function Shared(options = { port: null, clienPaths: null }) {
         const [address, port] = key.split("/");
         const msg = JSON.stringify({
           ...data,
-          path: ["server", ...data.path],
+          path: [...data.path],
           base: null,
           pathValues: null,
           value: data.value,
@@ -54,11 +54,10 @@ function Shared(options = { port: null, clienPaths: null }) {
       const [address, port] = key.split("/");
       const client = reactive.clients[data.path.slice(0, 1)];
       //DELETE DISNONNECTED
-
       const msg = JSON.stringify({
         //...data,
-        pathIds: [client._obId, ...data.pathIds.slice(1)],
-        path: ["client", ...data.path.slice(1)],
+        pathIds: [...data.pathIds.slice(1)],
+        path: [...data.path.slice(1)],
         base: null,
         pathValues: null,
         value: data.value,
@@ -144,12 +143,10 @@ class SharedClass {
 
       if (Array.isArray(data.path)) {
         //CHECK CLIENT PATHS
-
-        if (this.shared.options.clientPaths) {
+        console.log({ path: data.path });
+        if (this.shared.options.validations) {
           const localPath = data.path.join(".");
-          if (
-            !this.shared.options.clientPaths[localPath]?.validate(data.value)
-          ) {
+          if (!this.shared.options.validations[localPath]?.validate(data)) {
             sender.write(
               JSON.stringify({ error: `${data.path} rejected` }) + "\n\n"
             );
@@ -158,6 +155,7 @@ class SharedClass {
           }
         }
         //TODO SEND VALID RESPONSE
+
         sender.write(JSON.stringify({ ok: true }) + "\n\n");
         const path = ["clients", uuid, ...data.path];
         this.shared.mutted.add(path.join("."));
