@@ -117,7 +117,8 @@ class SharedClass {
 
   onmessage = async function (buff) {
     let sender = this.socket;
-
+    const port = this.shared.options.port;
+    const address = this.socket.remoteAddress.split(":").slice(-1)[0];
     let data;
 
     const payload = Buffer.from(buff).toString();
@@ -131,7 +132,6 @@ class SharedClass {
         continue;
       }
 
-      const { address, port } = data;
       let uuid = `${address}/${port}`;
 
       //CREATE REACTIVES
