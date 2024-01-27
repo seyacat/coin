@@ -14,12 +14,43 @@ const createKeyPair = () => {
       .toString("base64"),
     publicKey: publicKeyDer,
     address:
-      "s1" +
+      "01" +
       Buffer.from(sha256(sha256(publicKeyDer)), "hex")
         .toString("base64")
         .replace("/", "")
         .replace("+", "")
         .slice(0, 28),
+  };
+};
+
+const sign = (data, privateKey) => {
+  const sign = crypto.createSign("SHA256");
+  sign.update(data);
+  const signature = sign.sign(privateKey);
+  return signature;
+};
+
+newTransaction = (address, publicKey, amount) => {
+  transaction = {
+    data: {
+      version: 1,
+      inputs: [],
+      publicKey,
+      nonce: 0,
+      outputs: [(address, amount)],
+    },
+    signature: "",
+  };
+};
+
+newGenesis = (address, publicKey) => {
+  block = {
+    address: address,
+    transactions: [newTransaction(address, publicKey, 1000000)],
+    nonce: 0,
+    previousHash:
+      "0000000000000000000000000000000000000000000000000000000000000000",
+    hash: "0000000000000000000000000000000000000000000000000000000000000000",
   };
 };
 

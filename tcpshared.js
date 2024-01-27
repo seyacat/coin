@@ -2,7 +2,7 @@ const Net = require("net");
 
 var { Reactivate, Reactive } = require("@seyacat/reactive");
 
-function Shared(options = { port: null, clienPaths: null }) {
+function Shared(options = { port: null, validations: null }) {
   let reactive;
   //SERVER
   reactive = Reactivate(new SharedClass(options), {
@@ -85,7 +85,7 @@ function Shared(options = { port: null, clienPaths: null }) {
   return reactive;
 }
 class SharedClass {
-  constructor(options = { port: null, clienPaths: null }) {
+  constructor(options = { port: null, validations: null }) {
     this.mutted = new Set();
     this.options = { ...{ port: null, server: null }, ...options };
 
