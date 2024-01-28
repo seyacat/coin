@@ -78,7 +78,7 @@ setInterval(() => {
 
   for (const [key, client] of shared.clients) {
     if (client.lastBlockHash !== lastBlockHash) {
-      client.RequestLastBlockHash = true;
+      client.requestLastBlockHash = true;
     }
     //client.test = Math.floor(Math.random() * 100);
   }
