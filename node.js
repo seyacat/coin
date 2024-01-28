@@ -82,7 +82,7 @@ setInterval(() => {
   //console.log("CLIETNS", Object.keys(shared.clients._));
 
   for (const [key, client] of shared.clients) {
-    if (!client.lastBlockHash || client.lastBlockHash !== lastBlockHash) {
+    if (!client.lastBlockHash) {
       client.requestLastBlockHash = true;
     }
     //client.test = Math.floor(Math.random() * 100);
