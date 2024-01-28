@@ -14,7 +14,7 @@ const clients = JSON.parse(process.env.NODES);
 
 const { address, privateKey, publicKey } = cu.createKeyPair();
 
-let lastBlockHash = null;
+let lastBlockHash;
 let blockchain = {};
 
 if (process.env.TYPE === "Master") {
@@ -26,11 +26,19 @@ if (process.env.TYPE === "Master") {
   lastBlockHash = genesis.hash;
 }
 
+console.log(lastBlockHash);
+
 const shared = Shared({
   port,
   validations: {
     test: { validate: (data) => typeof data.value === "number" },
     introduce: { validate: (data) => typeof data.value === "boolean" },
+    RequestLastBlockHash: {
+      validate: (data) => typeof data.value === "boolean",
+    },
+    LastBlockHash: { validate: (data) => typeof data.value === "string" },
+    RequestBlock: { validate: (data) => typeof data.value === "string" },
+    LastBlock: { validate: (data) => typeof data.value === "object" },
   },
 });
 
