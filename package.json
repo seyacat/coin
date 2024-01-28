@@ -2,6 +2,7 @@
   "dependencies": {
     "@seyacat/reactive": "^1.0.12",
     "dotenv": "^16.4.1",
+    "json-bigint": "^1.0.0",
     "minimist": "^1.2.8",
     "uuid": "^9.0.1"
   }
