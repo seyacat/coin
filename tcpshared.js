@@ -142,14 +142,12 @@ class SharedClass {
 
       if (Array.isArray(data.path)) {
         //CHECK CLIENT PATHS
-        console.log({ path: data.path });
         if (this.shared.options.validations) {
           const localPath = data.path.join(".");
           if (!this.shared.options.validations[localPath]?.validate(data)) {
             sender.write(
               JSON.stringify({ error: `${data.path} rejected` }) + "\n\n"
             );
-            console.log({ error: `${data.path} rejected` });
             continue;
           }
         }
