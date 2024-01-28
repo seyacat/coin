@@ -58,9 +58,7 @@ shared.clients.subscribe(null, (data) => {
       break;
     case "lastBlockHash":
       if (!blockchain[data.value]) {
-        console.log("NEW BLOCK");
         client.requestBlock = data.value;
-        //TODO VALIDATE BLOCK
       }
       break;
     case "requestBlock":
@@ -69,7 +67,9 @@ shared.clients.subscribe(null, (data) => {
       }
       break;
     case "block":
+      //TODO VALIDATE BLOCK
       blockchain[data.value.hash] = data.value;
+      lastBlockHash = data.value.hash;
   }
 });
 
