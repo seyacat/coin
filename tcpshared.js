@@ -148,6 +148,7 @@ class SharedClass {
             sender.write(
               JSON.stringify({ error: `${data.path} rejected` }) + "\n\n"
             );
+            console.log({ error: `${data.path} rejected` });
             continue;
           }
         }

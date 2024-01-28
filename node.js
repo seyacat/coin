@@ -33,12 +33,12 @@ const shared = Shared({
   validations: {
     test: { validate: (data) => typeof data.value === "number" },
     introduce: { validate: (data) => typeof data.value === "boolean" },
-    RequestLastBlockHash: {
+    requestLastBlockHash: {
       validate: (data) => typeof data.value === "boolean",
     },
-    LastBlockHash: { validate: (data) => typeof data.value === "string" },
-    RequestBlock: { validate: (data) => typeof data.value === "string" },
-    LastBlock: { validate: (data) => typeof data.value === "object" },
+    lastBlockHash: { validate: (data) => typeof data.value === "string" },
+    requestBlock: { validate: (data) => typeof data.value === "string" },
+    lastBlock: { validate: (data) => typeof data.value === "object" },
   },
 });
 
@@ -51,18 +51,18 @@ shared.clients.subscribe(null, (data) => {
   const pathString = data.path.slice(1).join(".");
   console.log({ pathString, values: data.value });
   switch (pathString) {
-    case "RequestLastBlockHash":
+    case "requestLastBlockHash":
       client.lastBlockHash = lastBlockHash;
       break;
-    case "LastBlockHash":
+    case "lastBlockHash":
       if (!blockchain[data.value]) {
         console.log("NEW BLOCK");
-        client.RequestBlock = data.value;
+        client.requestBlock = data.value;
       }
       break;
-    case "RequestBlock":
+    case "requestBlock":
       if (blockchain[data.value]) {
-        client.LastBlock = blockchain[data.value];
+        client.lastBlock = blockchain[data.value];
       }
       break;
   }
