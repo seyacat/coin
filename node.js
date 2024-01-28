@@ -58,6 +58,8 @@ shared.clients.subscribe(null, (data) => {
       if (!blockchain[data.value]) {
         console.log("NEW BLOCK");
         client.requestBlock = data.value;
+        //TODO VALIDATE BLOCK
+        blockchain[data.value.hash] = data.value;
       }
       break;
     case "requestBlock":
