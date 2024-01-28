@@ -15,12 +15,14 @@ const clients = JSON.parse(process.env.NODES);
 const { address, privateKey, publicKey } = cu.createKeyPair();
 
 let lastBlockHash = null;
+let blockchain = {};
 
 if (process.env.TYPE === "Master") {
   const genesis = cu.createGenesis(address, privateKey, publicKey);
   log({
     genesis,
   });
+  blockchain[genesis.hash] = genesis;
   lastBlockHash = genesis.hash;
 }
 
@@ -33,16 +35,27 @@ const shared = Shared({
 });
 
 shared.subscribe(null, (data) => {
-  console.log(data.pathString, data.value);
+  //console.log(data.pathString, data.value);
 });
 
 shared.clients.subscribe(null, (data) => {
   const client = shared.clients[data.path[0]];
   const pathString = data.path.slice(1).join(".");
-  console.log({ pathString });
+  console.log({ pathString, values: data.value });
   switch (pathString) {
     case "RequestLastBlockHash":
       client.lastBlockHash = lastBlockHash;
+      break;
+    case "LastBlockHash":
+      if (!blockchain[data.value]) {
+        console.log("NEW BLOCK");
+        client.RequestBlock = data.value;
+      }
+      break;
+    case "RequestBlock":
+      if (blockchain[data.value]) {
+        client.LastBlock = blockchain[data.value];
+      }
       break;
   }
 });
