@@ -43,11 +43,7 @@ const shared = Shared({
 });
 
 shared.subscribe(null, (data) => {
-  //console.log(data.pathString, data.value);
-});
-
-shared.clients.subscribe(null, (data) => {
-  const client = shared.clients[data.path[0]];
+  const client = shared[data.path[0]];
   const pathString = data.path.slice(1).join(".");
   console.log({ pathString, value: data.value });
   switch (pathString) {
@@ -74,14 +70,10 @@ shared.clients.subscribe(null, (data) => {
 });
 
 setInterval(() => {
-  if (!shared.server.introduce) {
-    //shared.server.introduce = true;
-  }
-
   //shared.server.test = Math.floor(Math.random() * 100);
-  //console.log("CLIETNS", Object.keys(shared.clients._));
+  //console.log("CLIETNS", Object.keys(shared._));
 
-  for (const [key, client] of shared.clients) {
+  for (const [key, client] of shared) {
     if (!client.lastBlockHash) {
       client.requestLastBlockHash = true;
     }
