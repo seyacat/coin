@@ -2,16 +2,27 @@ const { Shared } = require("./tcpshared.js");
 const dotenv = require("dotenv");
 const argv = require("minimist")(process.argv.slice(2));
 const cu = require("./cryptoUtils.js");
+
+const log = (ob) => {
+  console.log(require("util").inspect(ob, false, null, true));
+};
+
 dotenv.config();
 
 const port = argv.port ?? process.env.PORT;
 const clients = JSON.parse(process.env.NODES);
 
-const address = cu.createKeyPair();
+const { address, privateKey, publicKey } = cu.createKeyPair();
 
-console.log({
-  address,
-});
+let lastBlockHash = null;
+
+if (process.env.TYPE === "Master") {
+  const genesis = cu.createGenesis(address, privateKey, publicKey);
+  log({
+    genesis,
+  });
+  lastBlockHash = genesis.hash;
+}
 
 const shared = Shared({
   port,
@@ -22,22 +33,23 @@ const shared = Shared({
 });
 
 shared.subscribe(null, (data) => {
-  console.log(data.path, data.value);
+  //console.log(data.path, data.value);
 });
 
 setInterval(() => {
-  //if (argv.port == 12345) {
   if (!shared.server.introduce) {
-    shared.server.introduce = true;
+    //shared.server.introduce = true;
   }
 
-  shared.server.test = Math.floor(Math.random() * 100);
+  //shared.server.test = Math.floor(Math.random() * 100);
   //console.log("CLIETNS", Object.keys(shared.clients._));
 
   for (const [key, client] of shared.clients) {
+    if (client.lastBlockHash !== lastBlockHash) {
+      client.RequestLastBlockHash = true;
+    }
     //client.test = Math.floor(Math.random() * 100);
   }
-  //}
 }, 10000);
 
 (async () => {
