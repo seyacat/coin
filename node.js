@@ -65,7 +65,7 @@ shared.clients.subscribe(null, (data) => {
       break;
     case "requestBlock":
       if (blockchain[data.value]) {
-        client.lastBlock = blockchain[data.value];
+        client.block = blockchain[data.value];
       }
       break;
     case "block":
