@@ -33,7 +33,18 @@ const shared = Shared({
 });
 
 shared.subscribe(null, (data) => {
-  //console.log(data.path, data.value);
+  console.log(data.pathString, data.value);
+});
+
+shared.clients.subscribe(null, (data) => {
+  const client = shared.clients[data.path[0]];
+  const pathString = data.path.slice(1).join(".");
+  console.log({ pathString });
+  switch (pathString) {
+    case "RequestLastBlockHash":
+      client.lastBlockHash = lastBlockHash;
+      break;
+  }
 });
 
 setInterval(() => {
