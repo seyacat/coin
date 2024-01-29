@@ -18,8 +18,7 @@ const createKeyPair = () => {
   pkreder = pktest.export({ type: "sec1", format: "der" }).toString("base64");
   console.log({ pktest });*/
 
-  const publicKeyDer = publicKey.export({ type: "spki", format: "der" });
-  console.log({ publicKeyDer });
+  //const publicKeyDer = publicKey.export({ type: "spki", format: "der" });
 
   return {
     privateKey,
@@ -52,11 +51,10 @@ const sign = (data, privateKey) => {
     data = Buffer.from(data);
   }
   const ret = crypto.sign("SHA256", data, privateKey);
-  console.log({ ret });
   return ret.toString("base64");
 };
 
-createTransaction = (address, privateKey, publicKey, amount) => {
+const createTransaction = (address, privateKey, publicKey, amount) => {
   const data = JSONb.stringify({
     version: 1,
     inputs: ["coinbase"],
@@ -94,19 +92,15 @@ const createGenesis = (address, privateKey, publicKey) => {
     1000000
   );
 
-  const transactionTree = {
-    root: initialTransaction.hash,
-    leafs: [initialTransaction],
-  };
-
-  const hash = sha256(JSONb.stringify(transactionTree));
+  const transactions = [initialTransaction];
+  const hash = sha256(JSONb.stringify(transactions));
 
   block = {
-    index: 0,
-    transactions: transactionTree,
+    index: Math.floor(Date.now() / 1000 / 60 / 5 - 1) * 5 * 60 * 1000,
+    transactions: transactions,
     previousHash: null,
     hash,
-    date: Date.now(),
+    date: Date.now() - 5 * 60 * 1000,
   };
   return block;
 };
@@ -119,4 +113,5 @@ const sha256 = (data) => {
 module.exports = {
   createKeyPair,
   createGenesis,
+  createTransaction,
 };

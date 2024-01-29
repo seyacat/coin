@@ -2,6 +2,9 @@ const { Shared } = require("./tcpshared.js");
 const dotenv = require("dotenv");
 const argv = require("minimist")(process.argv.slice(2));
 const cu = require("./cryptoUtils.js");
+const Blockchain = require("./blockchain.js");
+
+const bc = new Blockchain();
 
 const log = (ob) => {
   console.log(require("util").inspect(ob, false, null, true));
@@ -10,23 +13,48 @@ const log = (ob) => {
 dotenv.config();
 
 const port = argv.port ?? process.env.PORT;
-const clients = JSON.parse(process.env.NODES);
+const nodes = JSON.parse(process.env.NODES);
 
-const { address, privateKey, publicKey } = cu.createKeyPair();
+const myAddress = cu.createKeyPair();
 
 let lastBlockHash;
-let blockchain = {};
 
 if (process.env.TYPE === "Master") {
-  const genesis = cu.createGenesis(address, privateKey, publicKey);
+  const genesis = cu.createGenesis(
+    myAddress.address,
+    myAddress.privateKey,
+    myAddress.publicKey
+  );
   log({
     genesis,
+    date: new Date(genesis.date),
+    index: new Date(genesis.index),
   });
-  blockchain[genesis.hash] = genesis;
+  bc.addBlock(genesis);
   lastBlockHash = genesis.hash;
 }
 
-console.log(lastBlockHash);
+//TEST TRANSACTIONS
+const fakeAddresses = [myAddress];
+setInterval(() => {
+  fakeAddresses.push(cu.createKeyPair());
+  for (inputAddress of fakeAddresses) {
+    const balance = bc.getBalance(inputAddress.address);
+    if (balance > 0) {
+      for (outputAddress of fakeAddresses) {
+        if (inputAddress.address != outputAddress.address) {
+          const tx = cu.createTransaction(
+            outputAddress.address,
+            outputAddress.privateKey,
+            outputAddress.publicKey,
+            balance
+          );
+          console.log("TRASACCION", tx);
+        }
+      }
+    }
+  }
+}, 3000);
 
 const shared = Shared({
   port,
@@ -45,14 +73,13 @@ const shared = Shared({
 shared.subscribe(null, (data) => {
   const client = shared[data.path[0]];
   const pathString = data.path.slice(1).join(".");
-  console.log({ pathString, value: data.value });
   switch (pathString) {
     case "requestLastBlockHash":
       if (lastBlockHash) {
         client.lastBlockHash = lastBlockHash;
       }
       break;
-    case "lastBlockHash":
+    /*case "lastBlockHash":
       if (!blockchain[data.value]) {
         client.requestBlock = data.value;
       }
@@ -65,7 +92,7 @@ shared.subscribe(null, (data) => {
     case "block":
       //TODO VALIDATE BLOCK
       blockchain[data.value.hash] = data.value;
-      lastBlockHash = data.value.hash;
+      lastBlockHash = data.value.hash;*/
   }
 });
 
@@ -84,7 +111,7 @@ setInterval(() => {
 (async () => {
   //sleep 100
   await new Promise((resolve, reject) => setTimeout(resolve, 1000));
-  for (const address of clients) {
-    shared._rel.addTcpClient(address);
+  for (const peerIpAddress of nodes) {
+    shared._rel.addTcpClient(peerIpAddress);
   }
 })();
