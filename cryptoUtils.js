@@ -1,5 +1,4 @@
 const crypto = require("crypto");
-const { hasSubscribers } = require("diagnostics_channel");
 const JSONb = require("json-bigint");
 
 const createKeyPair = () => {
@@ -92,16 +91,28 @@ const createGenesis = (address, privateKey, publicKey) => {
     1000000
   );
 
-  const transactions = [initialTransaction];
-  const hash = sha256(JSONb.stringify(transactions));
+  //const transactions = [initialTransaction];
+  //const hash = sha256(JSONb.stringify(transactions));
+
+  const balance = {
+    vin:[],
+    u:null,
+    d:null,
+    address,
+    amount: 1000000,
+  }
+  data = JSONb.stringify({
+    v:1,
+    index: Math.floor(Date.now() / 1000 / 60 / 5 - 1) * 5 * 60 * 1000,
+    balances: [balance],
+    previousHash: null,
+  })
 
   block = {
-    index: Math.floor(Date.now() / 1000 / 60 / 5 - 1) * 5 * 60 * 1000,
-    transactions: transactions,
-    previousHash: null,
-    hash,
-    date: Date.now() - 5 * 60 * 1000,
+    data,
+    hash: sha256(data),
   };
+  Object.freeze(block)
   return block;
 };
 

@@ -1,8 +1,10 @@
+strict: true
 const { Shared } = require("./tcpshared.js");
 const dotenv = require("dotenv");
 const argv = require("minimist")(process.argv.slice(2));
 const cu = require("./cryptoUtils.js");
 const Blockchain = require("./blockchain.js");
+const { strict } = require("assert");
 
 const bc = new Blockchain();
 
@@ -13,7 +15,7 @@ const log = (ob) => {
 dotenv.config();
 
 const port = argv.port ?? process.env.PORT;
-const nodes = JSON.parse(process.env.NODES);
+const nodes = JSON.parse(process.env.NODES ?? "[]");
 
 const myAddress = cu.createKeyPair();
 
@@ -27,7 +29,6 @@ if (process.env.TYPE === "Master") {
   );
   log({
     genesis,
-    date: new Date(genesis.date),
     index: new Date(genesis.index),
   });
   bc.addBlock(genesis);
@@ -37,6 +38,10 @@ if (process.env.TYPE === "Master") {
 //TEST TRANSACTIONS
 const fakeAddresses = [myAddress];
 setInterval(() => {
+  return
+  if(fakeAddresses.length < 3) {
+    fakeAddresses.push(cu.createKeyPair());
+  }
   fakeAddresses.push(cu.createKeyPair());
   for (inputAddress of fakeAddresses) {
     const balance = bc.getBalance(inputAddress.address);
