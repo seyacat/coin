@@ -1,12 +1,19 @@
-strict: true
+strict: true;
 const { Shared } = require("./tcpshared.js");
 const dotenv = require("dotenv");
 const argv = require("minimist")(process.argv.slice(2));
 const cu = require("./cryptoUtils.js");
 const Blockchain = require("./blockchain.js");
-const { strict } = require("assert");
+const hexutils = require("./hexutils.js");
 
 const bc = new Blockchain();
+
+testNumbers = [50, 10, 20, 2, 12, 18];
+testNumbers.sort((a, b) => a - b);
+
+const ret = hexutils.bintree(testNumbers);
+console.log(JSON.stringify(ret, null, 2));
+return;
 
 const log = (ob) => {
   console.log(require("util").inspect(ob, false, null, true));
@@ -38,8 +45,8 @@ if (process.env.TYPE === "Master") {
 //TEST TRANSACTIONS
 const fakeAddresses = [myAddress];
 setInterval(() => {
-  return
-  if(fakeAddresses.length < 3) {
+  return;
+  if (fakeAddresses.length < 3) {
     fakeAddresses.push(cu.createKeyPair());
   }
   fakeAddresses.push(cu.createKeyPair());

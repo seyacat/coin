@@ -1,4 +1,8 @@
 {
+  "name": "coin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "node.js",
   "dependencies": {
     "@seyacat/reactive": "^1.0.12",
     "dotenv": "^16.4.1",
