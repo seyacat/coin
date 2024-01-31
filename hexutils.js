@@ -1,3 +1,4 @@
+//ts-check
 function and(a, b) {
   var out = "";
   while (a.length != b.length) {
@@ -35,7 +36,8 @@ function or(a, b) {
   return out;
 }
 
-const bintree = (data, offset = 0) => {
+const bintree = (data) => {};
+const bintreeFromBinString = (data, offset = 0) => {
   if (offset == 0) {
     data = homogen(data);
   }

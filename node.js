@@ -1,3 +1,4 @@
+// ts-check
 strict: true;
 const { Shared } = require("./tcpshared.js");
 const dotenv = require("dotenv");
@@ -8,7 +9,8 @@ const hexutils = require("./hexutils.js");
 
 const bc = new Blockchain();
 
-testNumbers = [50, 10, 20, 2, 12, 18];
+testNumbers = [50, 10, 20, 2, 12, 18].map((h) => cu.createKeyPair(h).address);
+console.log("tn", testNumbers);
 testNumbers.sort((a, b) => a - b);
 
 const ret = hexutils.bintree(testNumbers);
