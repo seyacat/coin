@@ -9,13 +9,6 @@ const hexutils = require("./lib/hexutils.js");
 
 const bc = new Blockchain();
 
-testNumbers = [50, 10, 20, 2, 12, 18].map((h) => cu.createKeyPair().address);
-console.log("tn", testNumbers);
-
-const ret = hexutils.bintree(testNumbers);
-console.log(JSON.stringify(ret, null, 2));
-return;
-
 const log = (ob) => {
   console.log(require("util").inspect(ob, false, null, true));
 };

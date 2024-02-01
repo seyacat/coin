@@ -3,11 +3,23 @@
   "version": "1.0.0",
   "description": "",
   "main": "node.js",
+  "scripts": {
+    "test": "c8 --reporter=lcov mocha --reporter list",
+    "test:watch": "mocha --watch --parallel --reporter list"
+  },
   "dependencies": {
     "@seyacat/reactive": "^1.0.12",
     "dotenv": "^16.4.1",
+    "g": "^2.0.1",
     "json-bigint": "^1.0.0",
     "minimist": "^1.2.8",
+    "mocha": "^10.2.0",
     "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "eslint-plugin-prettier": "^4.2.1",
+    "mocha": "^10.2.0",
+    "prettier": "2.8.7"
   }
 }
