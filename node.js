@@ -1,17 +1,16 @@
 // ts-check
 strict: true;
-const { Shared } = require("./tcpshared.js");
+const { Shared } = require("./lib/tcpshared.js");
 const dotenv = require("dotenv");
 const argv = require("minimist")(process.argv.slice(2));
-const cu = require("./cryptoUtils.js");
-const Blockchain = require("./blockchain.js");
-const hexutils = require("./hexutils.js");
+const cu = require("./lib/cryptoUtils.js");
+const Blockchain = require("./lib/blockchain.js");
+const hexutils = require("./lib/hexutils.js");
 
 const bc = new Blockchain();
 
-testNumbers = [50, 10, 20, 2, 12, 18].map((h) => cu.createKeyPair(h).address);
+testNumbers = [50, 10, 20, 2, 12, 18].map((h) => cu.createKeyPair().address);
 console.log("tn", testNumbers);
-testNumbers.sort((a, b) => a - b);
 
 const ret = hexutils.bintree(testNumbers);
 console.log(JSON.stringify(ret, null, 2));
