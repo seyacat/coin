@@ -11,7 +11,7 @@ describe("Array", function () {
         myAddress.privateKey,
         myAddress.publicKey
       );
-      console.log(genesis);
+      //console.log(genesis);
     });
   });
 });
