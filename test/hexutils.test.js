@@ -10,12 +10,18 @@ describe("Array", function () {
         return JSON.stringify({
           address: cu.createKeyPair().address,
           rnd: Math.random(),
-          h: h,
+          t: h,
         });
       });
       //console.log("tn", testNumbers);
-      const ret = hexutils.bintree(testNumbers);
-      console.dir(ret, { depth: null, colors: true });
+      const bt = new hexutils.BinTree(testNumbers);
+      //console.dir(bt.data, { depth: null, colors: true });
+      console.log(bt.toString());
+      console.log("findin", bt.find("0012sdf001"));
+
+      const testAddr = JSON.parse(testNumbers[0]).address;
+      console.log({ testAddr });
+      //console.log("findin", bt.find(testAddr));
     });
   });
 });
