@@ -6,7 +6,7 @@ const cu = require("../lib/cryptoUtils");
 describe("Array", function () {
   describe("#indexOf()", function () {
     it("should return -1 when the value is not present", function () {
-      testNumbers = [50, 10, 20, 2, 12, 18].map((h) => {
+      testNumbers = Array.apply(null, Array(500)).map((h) => {
         return JSON.stringify({
           address: cu.createKeyPair().address,
           rnd: Math.random(),
@@ -17,11 +17,11 @@ describe("Array", function () {
       const bt = new hexutils.BinTree(testNumbers);
       //console.dir(bt.data, { depth: null, colors: true });
       console.log(bt.toString());
-      console.log("findin", bt.find("0012sdf001"));
+      //console.log("findin", bt.find("0012sdf001"));
 
       const testAddr = JSON.parse(testNumbers[0]).address;
       console.log({ testAddr });
-      //console.log("findin", bt.find(testAddr));
+      console.log("findin", bt.find(testAddr));
     });
   });
 });
